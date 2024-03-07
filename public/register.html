@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      <link rel="stylesheet" href="bs/css/bootstrap.min.css" />
+
+      <title>Hello, world!</title>
+      <link rel="stylesheet" href="css/form.css" />
+   </head>
+
+   <body>
+      <div class="form-body">
+         <div class="row">
+            <div class="form-holder">
+               <div class="form-content">
+                  <div class="form-items">
+                     <h3>Register</h3>
+                     <form id="registerForm">
+                        <div class="col-md-12">
+                           <input class="form-control" id="email" type="email" name="email" placeholder="E-mail Address" required />
+                        </div>
+                        <div class="col-md-12">
+                           <input class="form-control" id="password" type="password" name="password" placeholder="Password" minlength="8" required />
+                        </div>
+                        <div class="col-md-12">
+                           <input class="form-control" id="passwordRpt" type="password" name="passwordRpt" placeholder="Password repeat" minlength="8" required />
+                        </div>
+                        <p id="mess" style="color: red; display: block; margin-top: 5px; font-size: 16px"></p>
+                        <div class="form-button mt-3">
+                           <button id="submit" type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                     </form>
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+
+      <script>
+         function setUpSubmitEvent() {
+            document.getElementById("registerForm").addEventListener("submit", async function (event) {
+               event.preventDefault();
+               if (isDataInFormCorrect()) {
+                  await sendDataToBackend(createRegisterObject());
+               }
+            });
+         }
+
+         function showMessageToUser(message) {
+            document.getElementById("mess").innerHTML = message;
+         }
+
+         function isDataInFormCorrect() {
+            var is_valid = true;
+            var email_formatter = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            let password = document.getElementById("password").value;
+            let password_repeat = document.getElementById("passwordRpt").value;
+            if (!email_formatter.test(document.getElementById("email").value)) {
+               console.log("aa");
+               showMessageToUser("Please enter a valid email address !");
+               is_valid = false;
+            }
+            if (password.length < 8) {
+               showMessageToUser("Password must be at least 8 characters long !");
+               is_valid = false;
+            }
+            if (password_repeat.length < 8) {
+               showMessageToUser("Password must be at least 8 characters long !");
+               is_valid = false;
+            }
+            if (password !== password_repeat) {
+               showMessageToUser("Passwords didn't match !");
+               is_valid = false;
+            }
+            return is_valid;
+         }
+
+         function createRegisterObject() {
+            return {
+               email: document.getElementById("email").value || "unknown",
+               password: document.getElementById("password").value || "unknown",
+            };
+         }
+
+         async function sendDataToBackend(register_object) {
+            try {
+               const response = await fetch("/registerUser", {
+                  method: "POST",
+                  headers: {
+                     "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify(register_object),
+               });
+
+               switch (response.status) {
+                  case 200:
+                     alert("Registration succesfull !");
+                     window.location.href = "/login";
+                     break;
+                  case 409:
+                     showMessageToUser("User with given email is already exists !");
+                     break;
+                  default:
+                     break;
+               }
+            } catch (error) {
+               console.error("Chyba pri odosielaní údajov na server:", error);
+            }
+         }
+
+         setUpSubmitEvent();
+      </script>
+      <script src="bs/js/bootstrap.bundle.min.js"></script>
+      <script src="js/form.js"></script>
+   </body>
+</html>
