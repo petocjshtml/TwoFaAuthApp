@@ -24,6 +24,11 @@ You also need a working connection to mongo database for the application to work
 ```bash
 echo DB_CONNECTION = ENTER_YOUR_MONGO_DB_CONNECTION_STRING_HERE >> .env
 ```
+In mongoDB you can set up for the app:
+ - dbname: "2fa_db"
+ - collection 1: "users"
+ - collection 2: "tokens"
+ - collection 3: "logins"
 # (Note: ip address is simulated)
 
 Obtaining the client's ip address is simulated, as this is not possible in local testing. However, when the application is produced and loaded on the server, to get the real ip address of the client, simply uncomment line 20 in this file:
