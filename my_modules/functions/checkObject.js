@@ -12,12 +12,12 @@ async function checkObject(req) {
 
    formData.password = crypto.createHash("md5").update(formData.password).digest("hex");
 
-   // let ipAddress = req.ip.replace("::ffff:","");
-   //simulácia ip
-   //let ipAddresses = ['213.81.233.163', '87.244.236.30', '147.232.200.10'];
-   let ipAddresses = ["87.244.236.30"];
+   // ip simulation
+   let ipAddresses = ['213.81.233.163', '87.244.236.30', '147.232.200.10'];
    const randomIpIndex = Math.floor(Math.random() * ipAddresses.length);
    let ipAddress = ipAddresses[randomIpIndex];
+   ipAddress = ['213.81.233.163', '87.244.236.30', '147.232.200.10'];
+   //ipAddress = req.ip.replace("::ffff:",""); 
    formData.ip = ipAddress;
 
    try {
