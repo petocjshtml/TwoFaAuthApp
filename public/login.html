@@ -89,11 +89,12 @@
                   },
                   body: JSON.stringify(login_object),
                });
+
+               const data = await response.json();
+               const queryParams = `email=${encodeURIComponent(data.email)}&time=${encodeURIComponent(data.time)}`;
+
                switch (response.status) {
                   case 200:
-                     const data = await response.json();
-                     const queryParams = `email=${encodeURIComponent(data.email)}&time=${encodeURIComponent(data.time)}`;
-                     console.log(queryParams);
                      window.location.href = `/?${queryParams}`;
                      break;
                   case 401:
@@ -104,7 +105,7 @@
                      window.location.href = "/register";
                      break;
                   case 404:
-                     window.location.href = `/auth?email=${login_object.email}`;
+                     window.location.href = `/auth?${queryParams}`;
                      break;
                   default:
                      break;

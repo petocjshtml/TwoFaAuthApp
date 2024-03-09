@@ -79,6 +79,27 @@ class LoginController {
          throw new Error(`Chyba pri vyhľadávaní záznamu o prihlásení podľa emailu a času: ${error.message}`);
       }
    }
+
+   // Metóda na nastavenie hodnoty login_success na true pre záznam podľa emailu a času
+   async setLoginSuccessByEmailAndTime(email, time) {
+      try {
+         // Aktualizácia záznamu o prihlásení, kde sa zhoduje email a čas
+         const updatedLogin = await Login.findOneAndUpdate(
+            { email, time },
+            { $set: { login_success: true } },
+            { new: true } // Vráti aktualizovaný dokument namiesto pôvodného
+         );
+
+         // Kontrola, či bol záznam úspešne aktualizovaný
+         if (updatedLogin) {
+            return updatedLogin;
+         } else {
+            throw new Error("Záznam o prihlásení nebol nájdený alebo už bol aktualizovaný.");
+         }
+      } catch (error) {
+         throw new Error(`Chyba pri nastavovaní úspechu prihlásenia: ${error.message}`);
+      }
+   }
 }
 
 module.exports = LoginController;

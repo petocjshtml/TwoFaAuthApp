@@ -16,21 +16,23 @@ const user_controller = new UserContoller();
 const login_controller = new LoginController();
 const token_controller = new TokenController();
 const email_sender = new EmailSender();
+require("dotenv").config();
 
 const app = express();
-const port = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(express.static("public"));
 app.use(bodyParser.json());
 
 mongoose
-   .connect("mongodb://localhost:27017/2fa_db")
+   .connect(process.env.DB_CONNECTION)
    .then(() => console.log("MongoDB Connected"))
    .catch((err) => console.error("MongoDB Connection Error:", err));
 
 app.post("/checkPage", async (req, res) => {
    let are_login_stats_valid = await login_controller.selectLoginByEmailAndTime(req.body.email, req.body.time);
    if (are_login_stats_valid) {
+      await login_controller.setLoginSuccessByEmailAndTime(req.body.email, req.body.time);
       let user_logins = await login_controller.selectAllLoginsByEmailAddress(req.body.email);
       res.status(200).json({ message: "Login stats are valid !", logins: user_logins });
    } else {
@@ -64,17 +66,19 @@ app.post("/loginUser", async (req, res) => {
             await login_controller.insertLogin(success_login_obj);
             res.status(200).json({ message: "Login succesfull !", email: success_login_obj.email, time: success_login_obj.time });
          } else {
-            res.status(404).json({ message: "Login is not verified - Redirect to Auth Page!", email: form_obj.email });
+            let failed_login_obj = createLoginObj(form_obj, false);
+            res.status(404).json({ message: "Login is not verified - Redirect to Auth Page!", email: failed_login_obj.email, time: failed_login_obj.time });
             await token_controller.deleteTokenByDetails(form_obj);
             await token_controller.insertToken(token);
             await email_sender.sendMail(token.code, token.valid_until_time, token.email);
-            await login_controller.insertLogin(createLoginObj(form_obj, false));
+            await login_controller.insertLogin(failed_login_obj);
          }
       } else {
-         res.status(404).json({ message: "Login is not verified - Redirect to Auth Page!", email: form_obj.email });
+         let failed_login_obj = createLoginObj(form_obj, false);
+         res.status(404).json({ message: "Login is not verified - Redirect to Auth Page!", email: form_obj.email, time: failed_login_obj.time });
          await token_controller.insertToken(token);
          await email_sender.sendMail(token.code, token.valid_until_time, token.email);
-         await login_controller.insertLogin(createLoginObj(form_obj, false));
+         await login_controller.insertLogin(failed_login_obj);
       }
    } else {
       let is_user_with_email_exists = await user_controller.selectUserByEmail(form_obj.email);
@@ -116,6 +120,6 @@ app.get("/auth", (req, res) => {
    res.sendFile(path.join(__dirname, "/public/auth.html"));
 });
 
-app.listen(port, () => {
-   console.log(`Server beží na porte ${port}`);
+app.listen(PORT, () => {
+   console.log(`Server beží na porte ${PORT}`);
 });

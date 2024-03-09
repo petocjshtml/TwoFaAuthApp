@@ -62,6 +62,7 @@
          }
 
          async function sendDataToBackend(inputs) {
+            const queryParams = new URLSearchParams(window.location.search);
             const code = Array.from(inputs)
                .map((input) => input.value)
                .join("");
@@ -73,9 +74,10 @@
                   },
                   body: JSON.stringify({ code, email }),
                });
+
                switch (response.status) {
                   case 200:
-                     window.location.href = "/login";
+                     window.location.href = `/?${queryParams}`;
                      break;
                   case 400:
                      showMessageToUser("Invalid verification code !");
