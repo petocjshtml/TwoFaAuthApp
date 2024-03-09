@@ -33,7 +33,10 @@ Use this simple command to start the application:
 ```bash
 npm start
 ```
-If you are testing the app locally, you can try visiting this link after launching it to see how it works:
+If you are testing the app locally, you can try visiting this link after launching it to see how it works:<br>
+
 http://localhost:3000/register
-The app also runs online on the server, so you can test it under this link:
+
+The app also runs online on the server, so you can test it under this link:<br>
+
 http://167.71.131.68:3000/register
